@@ -81,51 +81,35 @@ class CodeOCR:
             return None
     
     def clean_code(self, raw_text):
-        """Clean and format extracted text into proper FMSLogo commands"""
+        """Clean and format extracted text into proper FMSLogo commands (more permissive, multiple per line)"""
         if not raw_text:
             return ""
-        
         lines = raw_text.split('\n')
         cleaned_commands = []
-        
         for line in lines:
             line = line.strip().upper()
             if not line:
                 continue
-            
-            # Split line into words
             words = line.split()
-            if not words:
-                continue
-            
-            # Try to match known commands
-            for i, word in enumerate(words):
-                # Clean up common OCR mistakes
-                word = self.fix_common_ocr_errors(word)
-                
-                # Check if it's a known command
+            i = 0
+            while i < len(words):
+                word = self.fix_common_ocr_errors(words[i])
                 if word in self.known_commands:
                     command = word
-                    
-                    # Look for number after command
+                    # Look for a number after the command
                     if i + 1 < len(words):
                         next_word = words[i + 1]
-                        # Extract numbers (handle OCR number errors)
                         numbers = re.findall(r'\d+', next_word)
                         if numbers:
                             command += f" {numbers[0]}"
-                    
+                            i += 1  # Skip the number
                     cleaned_commands.append(command)
-                    break
-                
-                # Check for color commands
                 elif word == 'PENCOLOR' and i + 1 < len(words):
-                    color = words[i + 1].upper()
-                    color = self.fix_color_ocr_errors(color)
+                    color = self.fix_color_ocr_errors(words[i + 1].upper())
                     if color in self.known_colors:
                         cleaned_commands.append(f"PENCOLOR {color}")
-                    break
-        
+                        i += 1  # Skip the color
+                i += 1
         return '\n'.join(cleaned_commands)
     
     def fix_common_ocr_errors(self, word):

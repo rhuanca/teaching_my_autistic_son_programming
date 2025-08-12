@@ -65,3 +65,30 @@ Make lines going in all different directions from the center!
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
 
 **Completed:** ⬜ **Date:** ___________
+
+---
+
+## 📤 Share Your Work!
+**Send your code to Dad:**
+Copy all the commands you used today and send them in a message!
+Example: 
+```
+CS
+FD 50
+HOME
+RT 90
+FD 50
+HOME
+```
+
+**My commands:** 
+```
+
+
+
+
+
+
+
+
+```
