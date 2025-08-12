@@ -88,6 +88,24 @@ This guide provides comprehensive support for the first week of turtle graphics 
 - Compass navigation
 - Dance moves (quarter turns)
 
+## Getting Student's Code for Evaluation
+**Ask your son to email you his Day 2 code:**
+
+**Message to send:** *"Hey! Can you email me the code you wrote for Day 2? Just copy all the commands you typed in FMSLogo and send them to me in an email. I want to see what cool shapes you made!"*
+
+**What to expect in the email:** Text format with commands like:
+- `CS`
+- `FD 50`
+- `RT 90` 
+- `FD 50`
+
+**Your evaluation workflow:**
+1. Open the email with his code
+2. `conda activate turtle_eval`
+3. `python tools/fmslogo_evaluator.py`
+4. Select "Day 2", copy/paste code from email, evaluate
+5. Email him back with encouraging feedback and results
+
 ---
 
 # Day 3: Drawing Lines in All Directions

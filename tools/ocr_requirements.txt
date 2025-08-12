@@ -1,0 +1,8 @@
+# OCR Tool Requirements
+# Add these to your conda environment for the OCR functionality
+
+opencv-python
+pytesseract
+pillow
+numpy
+pyperclip  # optional, for clipboard copying

@@ -61,3 +61,26 @@ Learn to make the turtle turn left and right!
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
 
 **Completed:** ⬜ **Date:** ___________
+
+---
+
+## 📤 Share Your Work!
+**Send your code to Dad:**
+Copy all the commands you used today and send them in a message!
+Example: 
+```
+CS
+FD 50
+RT 90
+FD 50
+```
+
+**My commands:** 
+```
+
+
+
+
+
+
+
