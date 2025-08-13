@@ -490,15 +490,181 @@ class FMSLogoEvaluator:
     
     def evaluate_day4(self):
         """Day 4: Pen Control - PENUP and PENDOWN"""
-        return {"error": "Day 4 evaluation not implemented yet"}
+        results = {
+            "day": 4,
+            "title": "Pen Control - Up and Down",
+            "tests": [],
+            "passed": 0,
+            "total": 0,
+            "feedback": []
+        }
+        
+        # Test 1: Uses PENUP command
+        has_penup = any('PU' in cmd or 'PENUP' in cmd for cmd in self.commands_used)
+        if has_penup:
+            results["tests"].append({"name": "Uses PENUP command", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Great! You lifted the pen with PENUP!")
+        else:
+            results["tests"].append({"name": "Uses PENUP command", "passed": False})
+            results["feedback"].append("❌ Try using PENUP (or PU) to lift the pen")
+        results["total"] += 1
+        
+        # Test 2: Uses PENDOWN command  
+        has_pendown = any('PD' in cmd or 'PENDOWN' in cmd for cmd in self.commands_used)
+        if has_pendown:
+            results["tests"].append({"name": "Uses PENDOWN command", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Perfect! You put the pen down with PENDOWN!")
+        else:
+            results["tests"].append({"name": "Uses PENDOWN command", "passed": False})
+            results["feedback"].append("❌ Try using PENDOWN (or PD) to put the pen down")
+        results["total"] += 1
+        
+        # Test 3: Shows pen state control (changes between up/down)
+        pen_changes = 0
+        for i in range(1, len(self.pen_states)):
+            if self.pen_states[i] != self.pen_states[i-1]:
+                pen_changes += 1
+                
+        if pen_changes >= 2:  # At least 2 pen state changes (up then down, or down then up)
+            results["tests"].append({"name": "Controls pen state properly", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Excellent! You controlled when to draw and when not to draw!")
+        else:
+            results["tests"].append({"name": "Controls pen state properly", "passed": False})
+            results["feedback"].append("❌ Try: FD 50, PU, FD 50, PD, FD 50")
+        results["total"] += 1
+        
+        # Test 4: Bonus - Creates separated elements (moves without drawing)
+        if has_penup and has_pendown and len(self.positions) >= 4:
+            results["tests"].append({"name": "BONUS: Creates separate shapes", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Amazing! You made separate shapes or dashed lines!")
+        results["total"] += 1
+        
+        return results
     
     def evaluate_day6(self):
         """Day 6: Triangle Time"""
-        return {"error": "Day 6 evaluation not implemented yet"}
+        results = {
+            "day": 6,
+            "title": "Triangle Time",
+            "tests": [],
+            "passed": 0,
+            "total": 0,
+            "feedback": []
+        }
+        
+        # Test 1: Uses 120-degree turns (correct for triangles)
+        has_120_turns = any('120' in cmd for cmd in self.commands_used)
+        if has_120_turns:
+            results["tests"].append({"name": "Uses 120-degree turns", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Perfect! You used RT 120 for triangle corners!")
+        else:
+            results["tests"].append({"name": "Uses 120-degree turns", "passed": False})
+            results["feedback"].append("❌ Triangles need RT 120 turns, not RT 90!")
+        results["total"] += 1
+        
+        # Test 2: Creates triangle shape (returns close to start)
+        start_pos = self.positions[0]
+        end_pos = self.positions[-1]
+        distance = math.sqrt((end_pos[0] - start_pos[0])**2 + (end_pos[1] - start_pos[1])**2)
+        
+        if distance < 30:  # Close to starting position
+            results["tests"].append({"name": "Creates closed triangle shape", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Great! Your triangle closes properly!")
+        else:
+            results["tests"].append({"name": "Creates closed triangle shape", "passed": False})
+            results["feedback"].append("❌ Make sure to complete all 3 sides: FD, RT 120, FD, RT 120, FD, RT 120")
+        results["total"] += 1
+        
+        # Test 3: Has enough commands for a triangle (at least 6: FD RT FD RT FD RT)
+        movement_commands = len([cmd for cmd in self.commands_used if cmd.startswith(('FD', 'FORWARD'))])
+        turn_commands = len([cmd for cmd in self.commands_used if 'RT' in cmd or 'LT' in cmd])
+        
+        if movement_commands >= 3 and turn_commands >= 3:
+            results["tests"].append({"name": "Has enough commands for triangle", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Excellent! You have enough sides and turns!")
+        else:
+            results["tests"].append({"name": "Has enough commands for triangle", "passed": False})
+            results["feedback"].append("❌ A triangle needs 3 forward moves and 3 turns")
+        results["total"] += 1
+        
+        # Test 4: Bonus - Understands triangle vs square difference  
+        no_90_degree_turns = not any('90' in cmd for cmd in self.commands_used)
+        if has_120_turns and no_90_degree_turns:
+            results["tests"].append({"name": "BONUS: Uses only triangle angles", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Amazing! You know triangles are different from squares!")
+        results["total"] += 1
+        
+        return results
     
     def evaluate_day7(self):
         """Day 7: Colors and Fun"""
-        return {"error": "Day 7 evaluation not implemented yet"}
+        results = {
+            "day": 7,
+            "title": "Colors and Fun",
+            "tests": [],
+            "passed": 0,
+            "total": 0,
+            "feedback": []
+        }
+        
+        # Test 1: Uses PENCOLOR command
+        has_pencolor = any('PENCOLOR' in cmd for cmd in self.commands_used)
+        if has_pencolor:
+            results["tests"].append({"name": "Uses PENCOLOR command", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Great! You changed pen colors!")
+        else:
+            results["tests"].append({"name": "Uses PENCOLOR command", "passed": False})
+            results["feedback"].append("❌ Try using PENCOLOR RED or PENCOLOR BLUE")
+        results["total"] += 1
+        
+        # Test 2: Uses multiple colors
+        unique_colors = set()
+        for cmd in self.commands_used:
+            if 'PENCOLOR' in cmd:
+                # Extract color from command like "PENCOLOR RED"
+                parts = cmd.split()
+                if len(parts) > 1:
+                    unique_colors.add(parts[1])
+        
+        if len(unique_colors) >= 2:
+            results["tests"].append({"name": "Uses multiple colors", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Awesome! You used multiple colors!")
+        else:
+            results["tests"].append({"name": "Uses multiple colors", "passed": False})
+            results["feedback"].append("❌ Try using different colors like RED, BLUE, GREEN")
+        results["total"] += 1
+        
+        # Test 3: Creates colorful drawing (color changes + movement)
+        color_changes = len([cmd for cmd in self.commands_used if 'PENCOLOR' in cmd])
+        has_movement = any(cmd.startswith(('FD', 'BK')) for cmd in self.commands_used)
+        
+        if color_changes >= 2 and has_movement:
+            results["tests"].append({"name": "Creates colorful drawing", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Perfect! You made a colorful drawing!")
+        else:
+            results["tests"].append({"name": "Creates colorful drawing", "passed": False})
+            results["feedback"].append("❌ Try: PENCOLOR RED, FD 50, PENCOLOR BLUE, FD 50")
+        results["total"] += 1
+        
+        # Test 4: Bonus - Uses 3 or more colors  
+        if len(unique_colors) >= 3:
+            results["tests"].append({"name": "BONUS: Rainbow creation", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Amazing! You created a colorful rainbow!")
+        results["total"] += 1
+        
+        return results
 
     def evaluate_day5(self):
         """Day 5: Making a Square"""
