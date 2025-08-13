@@ -686,6 +686,146 @@ FD 100"""
         """Start the GUI"""
         self.root.mainloop()
 
+def show_console_results_gui(code, results, evaluator):
+    """Show a GUI popup with visual results for console mode"""
+    import tkinter as tk
+    from tkinter import scrolledtext
+    import turtle
+    
+    # Create popup window
+    popup = tk.Tk()
+    popup.title(f"Day {results['day']} Visual Results")
+    popup.geometry("1000x700")
+    
+    # Create main frame with two sections
+    main_frame = tk.Frame(popup)
+    main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+    
+    # Left side - embedded turtle graphics
+    left_frame = tk.Frame(main_frame, relief=tk.SUNKEN, bd=2)
+    left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    
+    tk.Label(left_frame, text="🐢 Turtle Drawing:", font=("Arial", 12, "bold")).pack(anchor=tk.W)
+    
+    # Create embedded turtle canvas
+    canvas_frame = tk.Frame(left_frame)
+    canvas_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+    
+    try:
+        # Create turtle canvas embedded in the tkinter window
+        canvas = tk.Canvas(canvas_frame, width=400, height=400, bg="white")
+        canvas.pack()
+        
+        # Create turtle screen using the canvas
+        screen = turtle.TurtleScreen(canvas)
+        screen.bgcolor("white")
+        
+        # Create turtle
+        t = turtle.RawTurtle(screen)
+        t.speed(0)
+        t.shape("triangle")
+        
+        # Execute the code step by step for visual feedback
+        lines = code.strip().split('\n')
+        commands = []
+        for line in lines:
+            line = line.strip().upper()
+            if line and not line.startswith('#'):
+                words = line.split()
+                commands.extend(words)
+        
+        # Execute commands
+        i = 0
+        while i < len(commands):
+            cmd = commands[i]
+            try:
+                if cmd in ['CLEARSCREEN', 'CS']:
+                    t.clear()
+                    t.home()
+                    t.setheading(90)
+                    i += 1
+                elif cmd in ['FORWARD', 'FD'] and i + 1 < len(commands):
+                    t.forward(float(commands[i + 1]))
+                    i += 2
+                elif cmd in ['BACKWARD', 'BK'] and i + 1 < len(commands):
+                    t.backward(float(commands[i + 1]))
+                    i += 2
+                elif cmd in ['RIGHT', 'RT'] and i + 1 < len(commands):
+                    t.right(float(commands[i + 1]))
+                    i += 2
+                elif cmd in ['LEFT', 'LT'] and i + 1 < len(commands):
+                    t.left(float(commands[i + 1]))
+                    i += 2
+                elif cmd in ['HOME']:
+                    t.home()
+                    t.setheading(90)
+                    i += 1
+                elif cmd in ['PENUP', 'PU']:
+                    t.penup()
+                    i += 1
+                elif cmd in ['PENDOWN', 'PD']:
+                    t.pendown()
+                    i += 1
+                else:
+                    i += 1
+            except:
+                i += 1
+        
+        screen.update()
+        tk.Label(left_frame, text="✅ Drawing complete!", 
+                font=("Arial", 10), fg="green").pack(pady=2)
+                
+    except Exception as e:
+        tk.Label(left_frame, text=f"Graphics error: {str(e)}", 
+                font=("Arial", 10), fg="red").pack(pady=5)
+    
+    # Right side - results
+    right_frame = tk.Frame(main_frame)
+    right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(10, 0))
+    
+    tk.Label(right_frame, text="📊 Evaluation Results:", font=("Arial", 12, "bold")).pack(anchor=tk.W)
+    
+    results_text = scrolledtext.ScrolledText(right_frame, height=20, font=("Courier", 10))
+    results_text.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
+    
+    # Display results (same format as GUI)
+    results_text.insert(tk.END, f"📊 Results for Day {results['day']}: {results['title']}\n")
+    results_text.insert(tk.END, "=" * 50 + "\n\n")
+    
+    score = results['passed']
+    total = results['total']
+    percentage = (score / total * 100) if total > 0 else 0
+    results_text.insert(tk.END, f"Score: {score}/{total} tests passed ({percentage:.0f}%)\n\n")
+    
+    results_text.insert(tk.END, "📋 Test Results:\n")
+    for test in results['tests']:
+        status = "✅ PASS" if test['passed'] else "❌ FAIL"
+        results_text.insert(tk.END, f"  {status}: {test['name']}\n")
+    
+    results_text.insert(tk.END, "\n💬 Feedback:\n")
+    for feedback in results['feedback']:
+        results_text.insert(tk.END, f"  {feedback}\n")
+    
+    results_text.insert(tk.END, "\n📈 Overall Assessment:\n")
+    if percentage >= 80:
+        results_text.insert(tk.END, f"  🎉 Excellent work! Ready for the next day!\n")
+    elif percentage >= 60:
+        results_text.insert(tk.END, f"  👍 Good job! Try the challenge extensions!\n")
+    else:
+        results_text.insert(tk.END, f"  📚 Keep practicing! Review the lesson and try again!\n")
+    
+    # Close button
+    close_btn = tk.Button(right_frame, text="✅ Close Results", 
+                         command=popup.destroy,
+                         bg="lightgreen", font=("Arial", 12))
+    close_btn.pack(pady=5)
+    
+    # Handle window close
+    popup.protocol("WM_DELETE_WINDOW", popup.destroy)
+    
+    # Show the popup
+    popup.mainloop()
+
 def main():
     """Main function"""
     if len(sys.argv) > 1 and sys.argv[1] == "--console":
@@ -694,7 +834,7 @@ def main():
         print("=" * 40)
         
         evaluator = FMSLogoEvaluator()
-        evaluator.reset_graphics(force_simulation=True)  # Force simulation in console mode
+        # Don't force simulation - let it try graphics for the popup
         
         try:
             # Get day number
@@ -715,7 +855,7 @@ def main():
             # Evaluate
             results = evaluator.evaluate_day(code, day)
             
-            # Display results (same logic as GUI)
+            # Display results in console first
             if "error" in results:
                 print(f"❌ Error: {results['error']}")
                 return
@@ -740,6 +880,10 @@ def main():
                 print(f"\n👍 Good job! ({percentage:.0f}%) Try the challenges!")
             else:
                 print(f"\n📚 Keep practicing! ({percentage:.0f}%) Review and try again!")
+            
+            # Now show GUI popup with visual results
+            print(f"\n🖼️  Opening visual results window...")
+            show_console_results_gui(code, results, evaluator)
             
             input("\nPress Enter to close...")
             
