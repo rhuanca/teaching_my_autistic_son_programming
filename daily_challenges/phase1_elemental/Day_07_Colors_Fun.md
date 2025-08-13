@@ -70,3 +70,30 @@ Make your drawings colorful and amazing! 🌈
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
 
 **Completed:** ⬜ **Date:** ___________
+
+---
+
+## 📤 Share Your Work!
+**Send your code to Dad:**
+Copy all the commands you used today and send them in a message!
+Example: 
+```
+CS
+PENCOLOR RED
+FD 50
+RT 90
+PENCOLOR BLUE
+FD 50
+```
+
+**My commands:** 
+```
+
+
+
+
+
+
+
+
+```

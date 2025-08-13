@@ -70,3 +70,31 @@ Learn to draw triangles - they need different turns than squares! 🔺
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
 
 **Completed:** ⬜ **Date:** ___________
+
+---
+
+## 📤 Share Your Work!
+**Send your code to Dad:**
+Copy all the commands you used today and send them in a message!
+Example: 
+```
+CS
+FD 100
+RT 120
+FD 100
+RT 120
+FD 100
+RT 120
+```
+
+**My commands:** 
+```
+
+
+
+
+
+
+
+
+```

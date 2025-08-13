@@ -12,10 +12,66 @@ import sys
 import io
 from contextlib import redirect_stdout, redirect_stderr
 
+class TurtleSimulator:
+    """Simulates turtle movements without graphics for evaluation"""
+    def __init__(self):
+        self.x = 0.0
+        self.y = 0.0
+        self.heading = 90.0  # FMSLogo starts facing up
+        self.pen_down = True
+        self.pen_color = "black"
+    
+    def position(self):
+        return (self.x, self.y)
+    
+    def heading_angle(self):
+        return self.heading
+    
+    def isdown(self):
+        return self.pen_down
+    
+    def pencolor(self):
+        return self.pen_color
+    
+    def forward(self, distance):
+        rad = math.radians(self.heading)
+        self.x += distance * math.cos(rad)
+        self.y += distance * math.sin(rad)
+    
+    def backward(self, distance):
+        self.forward(-distance)
+    
+    def right(self, angle):
+        self.heading = (self.heading - angle) % 360
+    
+    def left(self, angle):
+        self.heading = (self.heading + angle) % 360
+    
+    def penup(self):
+        self.pen_down = False
+    
+    def pendown(self):
+        self.pen_down = True
+    
+    def home(self):
+        self.x = 0.0
+        self.y = 0.0
+        self.heading = 90.0
+    
+    def setheading(self, angle):
+        self.heading = angle % 360
+    
+    def color(self, color):
+        self.pen_color = color
+    
+    def clear(self):
+        pass  # Just a placeholder
+
 class FMSLogoEvaluator:
     def __init__(self):
         self.screen = None
         self.turtle = None
+        self.simulation_mode = False
         self.reset_graphics()
         
         # Track turtle state during execution
@@ -25,7 +81,7 @@ class FMSLogoEvaluator:
         self.colors = []
         self.commands_used = []
         
-    def reset_graphics(self):
+    def reset_graphics(self, force_simulation=False):
         """Initialize or reset turtle graphics"""
         if self.screen:
             try:
@@ -33,23 +89,60 @@ class FMSLogoEvaluator:
             except:
                 pass
         
-        self.screen = turtle.Screen()
-        self.screen.setup(600, 600)
-        self.screen.bgcolor("white")
-        self.screen.title("FMSLogo Code Evaluator")
+        if force_simulation:
+            # Force simulation mode (for console or when graphics fail)
+            print("Running in simulation mode (no graphics window)")
+            self.simulation_mode = True
+            self.screen = None
+            self.turtle = TurtleSimulator()
+        else:
+            # Try graphics first, fall back to simulation if it fails
+            try:
+                # Clear any existing turtle instances
+                turtle.TurtleScreen._RUNNING = True
+                
+                self.screen = turtle.Screen()
+                self.screen.setup(600, 600)
+                self.screen.bgcolor("white")
+                self.screen.title("FMSLogo Code Evaluator - Results")
+                
+                # Disable animation for faster execution
+                self.screen.tracer(0)
+                
+                self.turtle = turtle.Turtle()
+                self.turtle.speed(0)
+                self.turtle.shape("triangle")
+                
+                self.simulation_mode = False
+                print("Graphics window initialized successfully")
+                
+            except Exception as e:
+                print(f"Graphics failed ({e}), using simulation mode")
+                self.simulation_mode = True
+                self.screen = None
+                self.turtle = TurtleSimulator()
         
-        self.turtle = turtle.Turtle()
-        self.turtle.speed(0)  # Fastest drawing
-        self.turtle.shape("triangle")
         self.reset_turtle_state()
     
     def reset_turtle_state(self):
         """Reset turtle to starting position and clear tracking"""
-        self.turtle.clear()
-        self.turtle.home()
-        self.turtle.pendown()
-        self.turtle.color("black")
-        self.turtle.setheading(90)  # Face up like FMSLogo
+        try:
+            self.turtle.clear()
+            self.turtle.home()
+            self.turtle.pendown()
+            self.turtle.color("black")
+            self.turtle.setheading(90)  # Face up like FMSLogo
+        except Exception as e:
+            if not self.simulation_mode:
+                print(f"Graphics command failed: {e}, switching to simulation mode")
+                self.simulation_mode = True
+                self.screen = None
+                self.turtle = TurtleSimulator()
+                self.turtle.clear()
+                self.turtle.home()
+                self.turtle.pendown()
+                self.turtle.color("black")
+                self.turtle.setheading(90)
         
         # Reset tracking
         self.positions = [(0, 0)]
@@ -60,11 +153,53 @@ class FMSLogoEvaluator:
     
     def track_state(self, command):
         """Track turtle state after each command"""
-        self.positions.append(self.turtle.position())
-        self.angles.append(self.turtle.heading())
-        self.pen_states.append(self.turtle.isdown())
-        self.colors.append(self.turtle.pencolor())
+        try:
+            self.positions.append(self.turtle.position())
+            # Handle both real turtle and simulator
+            if self.simulation_mode:
+                self.angles.append(self.turtle.heading_angle())
+            else:
+                self.angles.append(self.turtle.heading())
+            self.pen_states.append(self.turtle.isdown())
+            self.colors.append(self.turtle.pencolor())
+        except Exception as e:
+            if not self.simulation_mode:
+                print(f"Tracking failed: {e}, switching to simulation mode")
+                self.simulation_mode = True
+                self.screen = None
+                self.turtle = TurtleSimulator()
         self.commands_used.append(command)
+    
+    def switch_to_simulation(self):
+        """Switch from graphics to simulation mode"""
+        if self.screen:
+            try:
+                self.screen.bye()
+            except:
+                pass
+        self.simulation_mode = True
+        self.screen = None
+        # Copy current state from graphics turtle to simulator
+        old_pos = self.positions[-1] if self.positions else (0, 0)
+        old_angle = self.angles[-1] if self.angles else 90
+        old_pen = self.pen_states[-1] if self.pen_states else True
+        old_color = self.colors[-1] if self.colors else "black"
+        
+        self.turtle = TurtleSimulator()
+        self.turtle.x, self.turtle.y = old_pos
+        self.turtle.heading = old_angle
+        self.turtle.pen_down = old_pen
+        self.turtle.pen_color = old_color
+    
+    def execute_command(self, func_name, *args):
+        """Execute a turtle command with automatic fallback to simulation"""
+        try:
+            getattr(self.turtle, func_name)(*args)
+        except Exception as e:
+            if not self.simulation_mode:
+                print(f"Graphics command failed, switching to simulation mode")
+                self.switch_to_simulation()
+                getattr(self.turtle, func_name)(*args)
     
     def parse_and_execute(self, code):
         """Parse FMSLogo code and execute with Python turtle"""
@@ -90,7 +225,7 @@ class FMSLogoEvaluator:
                 if cmd in ['FORWARD', 'FD']:
                     if i + 1 < len(commands):
                         distance = float(commands[i + 1])
-                        self.turtle.forward(distance)
+                        self.execute_command('forward', distance)
                         self.track_state(f"FD {distance}")
                         i += 2
                     else:
@@ -100,7 +235,7 @@ class FMSLogoEvaluator:
                 elif cmd in ['BACKWARD', 'BK', 'BACK']:
                     if i + 1 < len(commands):
                         distance = float(commands[i + 1])
-                        self.turtle.backward(distance)
+                        self.execute_command('backward', distance)
                         self.track_state(f"BK {distance}")
                         i += 2
                     else:
@@ -110,7 +245,7 @@ class FMSLogoEvaluator:
                 elif cmd in ['RIGHT', 'RT']:
                     if i + 1 < len(commands):
                         angle = float(commands[i + 1])
-                        self.turtle.right(angle)
+                        self.execute_command('right', angle)
                         self.track_state(f"RT {angle}")
                         i += 2
                     else:
@@ -120,7 +255,7 @@ class FMSLogoEvaluator:
                 elif cmd in ['LEFT', 'LT']:
                     if i + 1 < len(commands):
                         angle = float(commands[i + 1])
-                        self.turtle.left(angle)
+                        self.execute_command('left', angle)
                         self.track_state(f"LT {angle}")
                         i += 2
                     else:
@@ -128,25 +263,25 @@ class FMSLogoEvaluator:
                         i += 1
                         
                 elif cmd in ['PENUP', 'PU']:
-                    self.turtle.penup()
+                    self.execute_command('penup')
                     self.track_state("PU")
                     i += 1
                     
                 elif cmd in ['PENDOWN', 'PD']:
-                    self.turtle.pendown()
+                    self.execute_command('pendown')
                     self.track_state("PD")
                     i += 1
                     
                 elif cmd in ['HOME']:
-                    self.turtle.home()
-                    self.turtle.setheading(90)  # Face up like FMSLogo
+                    self.execute_command('home')
+                    self.execute_command('setheading', 90)  # Face up like FMSLogo
                     self.track_state("HOME")
                     i += 1
                     
                 elif cmd in ['CLEARSCREEN', 'CS']:
-                    self.turtle.clear()
-                    self.turtle.home()
-                    self.turtle.setheading(90)
+                    self.execute_command('clear')
+                    self.execute_command('home')
+                    self.execute_command('setheading', 90)
                     self.track_state("CS")
                     i += 1
                     
@@ -291,6 +426,80 @@ class FMSLogoEvaluator:
         
         return results
     
+    def evaluate_day3(self):
+        """Day 3: All Directions - Lines from center using HOME"""
+        results = {
+            "day": 3,
+            "title": "All Directions - Lines from Center",
+            "tests": [],
+            "passed": 0,
+            "total": 0,
+            "feedback": []
+        }
+        
+        # Test 1: Uses HOME command
+        has_home = any('HOME' in cmd for cmd in self.commands_used)
+        if has_home:
+            results["tests"].append({"name": "Uses HOME command", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Great! You used HOME to return to center!")
+        else:
+            results["tests"].append({"name": "Uses HOME command", "passed": False})
+            results["feedback"].append("❌ Try using HOME to return to center between lines")
+        results["total"] += 1
+        
+        # Test 2: Creates radial pattern (multiple directions from center)
+        # Count how many times turtle returns close to center (0,0)
+        center_returns = 0
+        for pos in self.positions:
+            distance_from_center = math.sqrt(pos[0]**2 + pos[1]**2)
+            if distance_from_center < 20:  # Close to center
+                center_returns += 1
+        
+        if center_returns >= 3:  # At least 3 times at center (start + 2 returns)
+            results["tests"].append({"name": "Creates radial pattern from center", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Excellent! You made lines going out from center!")
+        else:
+            results["tests"].append({"name": "Creates radial pattern from center", "passed": False})
+            results["feedback"].append("❌ Try: FD 50, HOME, RT 90, FD 50, HOME")
+        results["total"] += 1
+        
+        # Test 3: Uses different directions (various angles or turns)
+        has_turns = any(cmd.startswith(('RT', 'LT', 'RIGHT', 'LEFT')) 
+                       for cmd in self.commands_used)
+        different_angles = len(set([round(a/45)*45 for a in self.angles])) >= 3  # At least 3 different directions
+        
+        if has_turns and different_angles:
+            results["tests"].append({"name": "Uses different directions", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("✅ Perfect! You drew lines in different directions!")
+        else:
+            results["tests"].append({"name": "Uses different directions", "passed": False})
+            results["feedback"].append("❌ Try turning to different angles: RT 90, RT 180, LT 90")
+        results["total"] += 1
+        
+        # Test 4: Bonus - Creates star-like pattern (4+ directions)
+        if center_returns >= 5 and different_angles:  # More returns = more lines
+            results["tests"].append({"name": "BONUS: Creates star pattern", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Amazing! You created a star-like pattern!")
+        results["total"] += 1
+        
+        return results
+    
+    def evaluate_day4(self):
+        """Day 4: Pen Control - PENUP and PENDOWN"""
+        return {"error": "Day 4 evaluation not implemented yet"}
+    
+    def evaluate_day6(self):
+        """Day 6: Triangle Time"""
+        return {"error": "Day 6 evaluation not implemented yet"}
+    
+    def evaluate_day7(self):
+        """Day 7: Colors and Fun"""
+        return {"error": "Day 7 evaluation not implemented yet"}
+
     def evaluate_day5(self):
         """Day 5: Making a Square"""
         results = {
@@ -409,9 +618,15 @@ FD 100"""
             return
         
         try:
-            # Reset evaluator for new evaluation
-            self.evaluator.reset_graphics()
+            # Reset evaluator for new evaluation (try graphics first in GUI mode)
+            self.evaluator.reset_graphics(force_simulation=False)
             results = self.evaluator.evaluate_day(code, day)
+            
+            # Update graphics window if available
+            if self.evaluator.screen and not self.evaluator.simulation_mode:
+                self.evaluator.screen.update()
+                # Keep window open for viewing
+                self.evaluator.screen.tracer(1)
             
             # Display results
             self.display_results(results)
@@ -479,6 +694,7 @@ def main():
         print("=" * 40)
         
         evaluator = FMSLogoEvaluator()
+        evaluator.reset_graphics(force_simulation=True)  # Force simulation in console mode
         
         try:
             # Get day number

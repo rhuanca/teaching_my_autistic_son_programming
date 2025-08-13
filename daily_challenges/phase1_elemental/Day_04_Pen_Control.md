@@ -68,3 +68,30 @@ Learn to control when the turtle draws and when it just moves!
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
 
 **Completed:** ⬜ **Date:** ___________
+
+---
+
+## 📤 Share Your Work!
+**Send your code to Dad:**
+Copy all the commands you used today and send them in a message!
+Example: 
+```
+CS
+FD 50
+PU
+FD 30
+PD
+FD 50
+```
+
+**My commands:** 
+```
+
+
+
+
+
+
+
+
+```
