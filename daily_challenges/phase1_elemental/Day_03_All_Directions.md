@@ -58,8 +58,6 @@ Make lines going in all different directions from the center!
 ## My Work Today:
 **What I learned:** ________________________________
 
-**My coolest pattern:** _____________________________
-
 **Something that surprised me:** ______________________
 
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)

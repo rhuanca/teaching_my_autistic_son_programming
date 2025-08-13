@@ -61,8 +61,6 @@ Learn to control when the turtle draws and when it just moves!
 ## My Work Today:
 **What I learned:** ________________________________
 
-**My favorite pattern:** ____________________________
-
 **Something tricky I figured out:** ____________________
 
 **Rating:** ⭐⭐⭐⭐⭐ (circle the stars!)
