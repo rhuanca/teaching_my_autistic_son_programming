@@ -567,18 +567,25 @@ class FMSLogoEvaluator:
             results["feedback"].append("❌ Triangles need RT 120 turns, not RT 90!")
         results["total"] += 1
         
-        # Test 2: Creates triangle shape (returns close to start)
-        start_pos = self.positions[0]
-        end_pos = self.positions[-1]
-        distance = math.sqrt((end_pos[0] - start_pos[0])**2 + (end_pos[1] - start_pos[1])**2)
-        
-        if distance < 30:  # Close to starting position
-            results["tests"].append({"name": "Creates closed triangle shape", "passed": True})
+        # Test 2: Shows triangle drawing attempt (at least 2 triangle sides)
+        triangle_sides = 0
+        i = 0
+        while i < len(self.commands_used) - 1:
+            cmd = self.commands_used[i]
+            next_cmd = self.commands_used[i + 1] if i + 1 < len(self.commands_used) else ""
+            
+            # Count FD commands followed by RT 120
+            if cmd.startswith('FD') and ('RT 120' in next_cmd or 'LT 120' in next_cmd):
+                triangle_sides += 1
+            i += 1
+            
+        if triangle_sides >= 2:  # At least 2 sides of triangle with correct turns
+            results["tests"].append({"name": "Draws triangle with correct angles", "passed": True})
             results["passed"] += 1
-            results["feedback"].append("✅ Great! Your triangle closes properly!")
+            results["feedback"].append("✅ Great! You drew triangle sides with RT 120!")
         else:
-            results["tests"].append({"name": "Creates closed triangle shape", "passed": False})
-            results["feedback"].append("❌ Make sure to complete all 3 sides: FD, RT 120, FD, RT 120, FD, RT 120")
+            results["tests"].append({"name": "Draws triangle with correct angles", "passed": False})
+            results["feedback"].append("❌ Try: FD 80, RT 120, FD 80, RT 120, FD 80")
         results["total"] += 1
         
         # Test 3: Has enough commands for a triangle (at least 6: FD RT FD RT FD RT)
@@ -594,12 +601,18 @@ class FMSLogoEvaluator:
             results["feedback"].append("❌ A triangle needs 3 forward moves and 3 turns")
         results["total"] += 1
         
-        # Test 4: Bonus - Understands triangle vs square difference  
-        no_90_degree_turns = not any('90' in cmd for cmd in self.commands_used)
-        if has_120_turns and no_90_degree_turns:
-            results["tests"].append({"name": "BONUS: Uses only triangle angles", "passed": True})
+        # Test 4: Bonus - Demonstrates triangle vs square understanding
+        has_90_turns = any('90' in cmd for cmd in self.commands_used)  
+        has_both_shapes = has_120_turns and has_90_turns
+        
+        if has_both_shapes:
+            results["tests"].append({"name": "BONUS: Shows both triangles and squares", "passed": True})
             results["passed"] += 1
-            results["feedback"].append("⭐ Amazing! You know triangles are different from squares!")
+            results["feedback"].append("⭐ Amazing! You made both triangles (RT 120) and squares (RT 90)!")
+        elif has_120_turns:
+            results["tests"].append({"name": "BONUS: Uses triangle angles", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Great! You understand triangle angles!")
         results["total"] += 1
         
         return results

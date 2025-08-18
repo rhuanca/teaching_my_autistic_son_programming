@@ -45,10 +45,8 @@ Make your drawings colorful and amazing! 🌈
 
 ### Easy:
 - Make a rainbow using all colors you know
-- Draw your favorite color triangle and square
 
 ### Hard:
-- Create a flower with different colored petals
 - Draw a house with colored parts (red roof, blue walls, etc.)
 
 ---

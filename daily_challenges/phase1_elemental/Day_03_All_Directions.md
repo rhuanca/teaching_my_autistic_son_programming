@@ -39,12 +39,10 @@ Make lines going in all different directions from the center!
 ## Challenge Time! ⭐
 
 ### Easy:
-- Make longer lines: use `FD 100` instead of `FD 50`
 - Try diagonal lines: `RT 45`, `FD 70`, `HOME`
 
 ### Hard:
 - Can you make exactly 6 lines equally spaced?
-- Create your own "fireworks" pattern!
 
 ---
 

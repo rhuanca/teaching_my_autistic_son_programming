@@ -1,0 +1,28 @@
+cs
+fd 80
+home
+rt 45
+fd 80
+home
+rt 990
+rt 45
+fd 80
+home
+lt 90
+fd 80
+home
+rt 90
+fd 80
+home
+rt 45
+rt 45
+fd 80
+home
+rt 90
+rt 90
+fd 80
+home
+rt 90
+rt 45
+fd 80
+home

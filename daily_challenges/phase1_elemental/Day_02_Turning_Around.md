@@ -36,11 +36,9 @@ Learn to make the turtle turn left and right!
 
 ### Easy:
 - Make a "staircase": `FD 30`, `RT 90`, `FD 30`, `LT 90`, `FD 30`
-- Try a smaller turn: `RT 45` then `FD 100`
 
 ### Hard:
 - Can you make the turtle face straight down? (Hint: try `RT 180`)
-- Make four connected lines using only right turns
 
 ---
 
@@ -53,8 +51,6 @@ Learn to make the turtle turn left and right!
 
 ## My Work Today:
 **What I learned:** ________________________________
-
-**My favorite shape:** ______________________________
 
 **Something cool I made:** ___________________________
 

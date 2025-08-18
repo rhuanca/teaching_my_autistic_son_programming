@@ -45,10 +45,8 @@ Learn to draw triangles - they need different turns than squares! 🔺
 
 ### Easy:
 - Draw triangles in different sizes
-- What happens if you use `RT 60` instead of `RT 120`?
 
 ### Hard:
-- Draw a triangle pointing downward (start with `RT 180`)
 - Make a triangle next to a square
 
 ---

@@ -36,10 +36,8 @@ Learn to make the turtle move forward and backward!
 
 ### Easy:
 - Try `FD 50` then `FD 50` - what happens?
-- Make the longest line you can: `FD 300`
 
 ### Hard:
-- Can you make the turtle end up exactly where it started?
 - Try: `FD 150` then `BK 150`
 
 ---

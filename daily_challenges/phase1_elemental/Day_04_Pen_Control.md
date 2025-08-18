@@ -42,12 +42,10 @@ Learn to control when the turtle draws and when it just moves!
 ## Challenge Time! ⭐
 
 ### Easy:
-- Make three separate small lines in different places
 - Create a pattern: draw, skip, draw, skip, draw
 
 ### Hard:
 - Draw the letter "H" using pen up/down
-- Make two squares that don't touch each other
 
 ---
 

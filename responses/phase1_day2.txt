@@ -1,0 +1,32 @@
+cs
+rt 90
+lt 90
+lt 90
+fd 150
+
+cs
+lt 90
+fd 100
+rt 50
+fd 20
+rt 50
+lt 10
+fd 100
+rt 50
+fd 20
+rt 50
+lt 10
+fd 100
+fd 100
+rt 50
+fd 20
+rt 50
+lt 10
+fd 100
+rt 50
+fd 20
+rt 50
+lt 10
+fd 100
+to
+end

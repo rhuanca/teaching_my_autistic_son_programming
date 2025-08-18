@@ -41,11 +41,9 @@ Create your first complete shape - a perfect square! 🟩
 
 ### Easy:
 - Make three squares: small (50), medium (100), large (150)
-- Try making a square with `FD 25` - super tiny!
 
 ### Hard:
 - Draw two squares that don't touch (use pen up/down)
-- Make a square inside another square
 
 ---
 
