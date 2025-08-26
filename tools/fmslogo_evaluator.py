@@ -80,6 +80,7 @@ class FMSLogoEvaluator:
         self.pen_states = []
         self.colors = []
         self.commands_used = []
+        self.repeat_commands_used = []  # Track REPEAT usage separately
         
     def reset_graphics(self, force_simulation=False):
         """Initialize or reset turtle graphics"""
@@ -150,6 +151,7 @@ class FMSLogoEvaluator:
         self.pen_states = [True]
         self.colors = ["black"]
         self.commands_used = []
+        self.repeat_commands_used = []
     
     def track_state(self, command):
         """Track turtle state after each command"""
@@ -201,19 +203,73 @@ class FMSLogoEvaluator:
                 self.switch_to_simulation()
                 getattr(self.turtle, func_name)(*args)
     
+    def parse_line_with_repeat(self, line):
+        """Parse a line that might contain REPEAT commands"""
+        if 'REPEAT' not in line:
+            # No REPEAT, just split by spaces
+            return line.split()
+        
+        # Handle REPEAT command: REPEAT n [commands]
+        try:
+            # Find REPEAT pattern
+            if line.startswith('REPEAT'):
+                parts = line.split('[', 1)
+                if len(parts) != 2:
+                    print(f"Error: REPEAT needs [ ] brackets: {line}")
+                    return line.split()
+                
+                # Extract repeat count
+                repeat_part = parts[0].strip()  # "REPEAT n"
+                commands_part = parts[1].strip()  # "commands]"
+                
+                if not commands_part.endswith(']'):
+                    print(f"Error: REPEAT needs closing ] bracket: {line}")
+                    return line.split()
+                
+                # Remove closing bracket
+                commands_part = commands_part[:-1].strip()
+                
+                # Get repeat count
+                repeat_words = repeat_part.split()
+                if len(repeat_words) != 2:
+                    print(f"Error: REPEAT format should be 'REPEAT n': {line}")
+                    return line.split()
+                
+                try:
+                    repeat_count = int(repeat_words[1])
+                except ValueError:
+                    print(f"Error: REPEAT count must be a number: {line}")
+                    return line.split()
+                
+                # Track REPEAT usage for evaluation
+                self.repeat_commands_used.append(f"REPEAT {repeat_count} [{commands_part}]")
+                
+                # Expand REPEAT into individual commands
+                expanded_commands = []
+                command_list = commands_part.split()
+                for _ in range(repeat_count):
+                    expanded_commands.extend(command_list)
+                
+                return expanded_commands
+            else:
+                # REPEAT somewhere else in line - not supported yet
+                return line.split()
+                
+        except Exception as e:
+            print(f"Error parsing REPEAT: {e}")
+            return line.split()
+    
     def parse_and_execute(self, code):
         """Parse FMSLogo code and execute with Python turtle"""
         self.reset_turtle_state()
         
-        # Clean and split code into commands
+        # Clean and split code into commands, handling REPEAT
         lines = code.strip().split('\n')
         commands = []
         for line in lines:
             line = line.strip().upper()
             if line and not line.startswith('#') and not line.startswith('//'):
-                # Split by spaces but keep command pairs together
-                words = line.split()
-                commands.extend(words)
+                commands.extend(self.parse_line_with_repeat(line))
         
         print(f"Executing commands: {commands}")
         
@@ -332,6 +388,12 @@ class FMSLogoEvaluator:
                 return self.evaluate_day6()
             elif day_number == 7:
                 return self.evaluate_day7()
+            elif day_number == 8:
+                return self.evaluate_day8()
+            elif day_number == 9:
+                return self.evaluate_day9()
+            elif day_number == 10:
+                return self.evaluate_day10()
             else:
                 return {"error": f"Day {day_number} not implemented yet"}
         except Exception as e:
@@ -678,66 +740,104 @@ class FMSLogoEvaluator:
         results["total"] += 1
         
         return results
-
-    def evaluate_day5(self):
-        """Day 5: Making a Square"""
+    
+    def evaluate_day8(self):
+        """Day 8: First REPEAT - The Power Loop!"""
         results = {
-            "day": 5,
-            "title": "Making a Square",
+            "day": 8,
+            "title": "First REPEAT - The Power Loop!",
             "tests": [],
             "passed": 0,
             "total": 0,
             "feedback": []
         }
         
-        # Test 1: Has enough commands for a square
-        if len(self.commands_used) >= 8:  # FD RT FD RT FD RT FD RT minimum
-            results["tests"].append({"name": "Has enough commands for square", "passed": True})
+        # Test 1: Uses REPEAT command
+        has_repeat = len(self.repeat_commands_used) > 0
+        if has_repeat:
+            results["tests"].append({"name": "Uses REPEAT command", "passed": True})
             results["passed"] += 1
-            results["feedback"].append("✅ Good! You used enough commands!")
+            results["feedback"].append("✅ Awesome! You discovered the power of REPEAT!")
         else:
-            results["tests"].append({"name": "Has enough commands for square", "passed": False})
-            results["feedback"].append("❌ A square needs 8 commands: FD RT FD RT FD RT FD RT")
+            results["tests"].append({"name": "Uses REPEAT command", "passed": False})
+            results["feedback"].append("❌ Try using REPEAT 4 [FD 80 RT 90] for a square")
         results["total"] += 1
         
-        # Test 2: Returns close to starting position
+        # Test 2: Creates recognizable shape (returns close to start)
         start_pos = self.positions[0]
         end_pos = self.positions[-1]
         distance = math.sqrt((end_pos[0] - start_pos[0])**2 + (end_pos[1] - start_pos[1])**2)
         
-        if distance < 30:
-            results["tests"].append({"name": "Shape closes properly", "passed": True})
+        if distance < 30:  # Close to starting position = closed shape
+            results["tests"].append({"name": "Creates closed shape", "passed": True})
             results["passed"] += 1
-            results["feedback"].append("✅ Excellent! Your shape closes!")
+            results["feedback"].append("✅ Perfect! Your shape closes properly!")
         else:
-            results["tests"].append({"name": "Shape closes properly", "passed": False})
-            results["feedback"].append("❌ Make sure all sides are equal length")
+            results["tests"].append({"name": "Creates closed shape", "passed": False})
+            results["feedback"].append("❌ Make sure your shape closes: try REPEAT 4 [FD 80 RT 90]")
         results["total"] += 1
         
-        # Test 3: Uses 90-degree turns
-        right_angle_count = 0
-        for cmd in self.commands_used:
-            if 'RT 90' in cmd or 'LT 90' in cmd:
-                right_angle_count += 1
-        
-        if right_angle_count >= 3:
-            results["tests"].append({"name": "Uses 90-degree angles", "passed": True})
+        # Test 3: Uses efficient coding (fewer typed commands than old way)
+        total_commands = len(self.commands_used)
+        if has_repeat and total_commands <= 10:  # REPEAT makes code much shorter
+            results["tests"].append({"name": "Writes efficient code", "passed": True})
             results["passed"] += 1
-            results["feedback"].append("✅ Perfect! You used 90-degree angles!")
+            results["feedback"].append("✅ Great! REPEAT made your code much shorter!")
         else:
-            results["tests"].append({"name": "Uses 90-degree angles", "passed": False})
-            results["feedback"].append("❌ Squares need RT 90 or LT 90 for corners")
+            results["tests"].append({"name": "Writes efficient code", "passed": False})
+            results["feedback"].append("❌ REPEAT should make your code shorter - try REPEAT instead of typing each command")
+        results["total"] += 1
+        
+        # Test 4: Bonus - Shows understanding of loops concept
+        if has_repeat and distance < 30:  # Both uses REPEAT AND makes proper shape
+            results["tests"].append({"name": "BONUS: Masters loop concept", "passed": True})
+            results["passed"] += 1
+            results["feedback"].append("⭐ Amazing! You understand how loops work!")
         results["total"] += 1
         
         return results
+
+    def evaluate_day_8(self):
+        """Evaluate Day 8: REPEAT Command Patterns"""
+        print("\nEvaluating Day 8: REPEAT Command Patterns")
+
+        # Reset turtle state
+        self.reset_turtle_state()
+
+        # Example Day 8 pattern: Draw a square using REPEAT
+        try:
+            self.execute_command("REPEAT 4 [ FD 100 RT 90 ]")
+            print("Day 8 evaluation completed successfully.")
+        except Exception as e:
+            print(f"Error during Day 8 evaluation: {e}")
+
+    def evaluate_day_9(self):
+        """Evaluate Day 9: Advanced REPEAT Patterns"""
+        print("\nEvaluating Day 9: Advanced REPEAT Patterns")
+
+        # Reset turtle state
+        self.reset_turtle_state()
+
+        # Example Day 9 pattern: Draw a star using REPEAT
+        try:
+            self.execute_command("REPEAT 5 [ FD 100 RT 144 ]")
+            print("Day 9 evaluation completed successfully.")
+        except Exception as e:
+            print(f"Error during Day 9 evaluation: {e}")
+
+# Example usage
+if __name__ == "__main__":
+    evaluator = FMSLogoEvaluator()
+    evaluator.evaluate_day_9()
     
     def close(self):
-        """Close turtle graphics"""
-        if self.screen:
+        """Close the evaluator and clean up resources"""
+        if self.screen and not self.simulation_mode:
             try:
                 self.screen.bye()
-            except:
-                pass
+            except Exception as e:
+                print(f"Error closing graphics window: {e}")
+        print("Evaluator closed successfully.")
 
 class EvaluatorGUI:
     def __init__(self):
@@ -760,6 +860,7 @@ class EvaluatorGUI:
         day_menu.pack(side=tk.LEFT, padx=(5, 0))
         
         # Code input
+        tk.Label(self.root, text="Enter FMSLogo Code:", font=("Arial", 12)).pack(anchor=tk.W, padx=10)
         tk.Label(self.root, text="Enter FMSLogo Code:", font=("Arial", 12)).pack(anchor=tk.W, padx=10)
         self.code_text = scrolledtext.ScrolledText(self.root, height=10, font=("Courier", 10))
         self.code_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
@@ -806,6 +907,15 @@ FD 100"""
                 self.evaluator.screen.update()
                 # Keep window open for viewing
                 self.evaluator.screen.tracer(1)
+                # Set clear title for closing
+                self.evaluator.screen.title("FMSLogo Results - Close with X button or click anywhere")
+                # Make window close on click (non-blocking)
+                def close_on_click(x, y):
+                    try:
+                        self.evaluator.close()
+                    except:
+                        pass
+                self.evaluator.screen.onclick(close_on_click)
             
             # Display results
             self.display_results(results)
@@ -951,8 +1061,16 @@ def show_console_results_gui(code, results, evaluator):
                 i += 1
         
         screen.update()
-        tk.Label(left_frame, text="✅ Drawing complete!", 
+        tk.Label(left_frame, text="✅ Drawing complete! Click turtle canvas to close it.", 
                 font=("Arial", 10), fg="green").pack(pady=2)
+        
+        # Add click to close functionality for embedded turtle
+        def close_embedded_turtle():
+            try:
+                canvas.destroy()
+            except:
+                pass
+        screen.onclick(lambda x, y: close_embedded_turtle())
                 
     except Exception as e:
         tk.Label(left_frame, text=f"Graphics error: {str(e)}", 
