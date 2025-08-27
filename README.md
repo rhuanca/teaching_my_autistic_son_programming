@@ -163,11 +163,11 @@ teaching_my_autistic_son_programming/
 
 ## 🔮 Future Development
 
-### Phase 2: Basic Programming (Days 15-35)
-- REPEAT loops for patterns
-- Variables and procedures
-- Conditional logic
-- Complex geometric patterns
+### Phase 2: Basic Programming (Days 14-17)
+- **Day 14: Variables for Dynamic Spirals** - Learn how to use variables to create spirals that grow dynamically.
+- **Day 15: Variables for Patterns** - Use variables to create repeating patterns with increasing complexity.
+- **Day 16: MODULO for Color Patterns** - Explore the `MODULO` operator to cycle through colors in a spiral.
+- **Day 17: MODULO for Shape Patterns** - Use the `MODULO` operator to create patterns with different shapes.
 
 ### Phase 3: Mid-Level Concepts (Days 36-60)
 - Nested loops

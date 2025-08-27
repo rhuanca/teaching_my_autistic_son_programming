@@ -82,8 +82,19 @@
 | 38 | _____ | Nested REPEAT Loops | ⬜ | |
 | 39 | _____ | Complex Geometric Patterns | ⬜ | |
 | 40 | _____ | Mathematical Art | ⬜ | |
-| ... | _____ | (Additional challenges) | ⬜ | |
-| 60 | _____ | Final Project Presentation | ⬜ | |
+| 41 | _____ | Variables for Dynamic Spirals | ⬜ | |
+| 42 | _____ | Variables for Patterns | ⬜ | |
+| 43 | _____ | MODULO for Color Patterns | ⬜ | |
+| 44 | _____ | MODULO for Shape Patterns | ⬜ | |
+| 45 | _____ | Advanced Star Fields | ⬜ | |
+| 46 | _____ | 3D Effects with Overlapping Shapes | ⬜ | |
+| 47 | _____ | Fractal Patterns Introduction | ⬜ | |
+| 48 | _____ | Creating Depth with Shadows | ⬜ | |
+| 49 | _____ | Interactive Turtle Graphics | ⬜ | |
+| 50 | _____ | Sound and Music with Turtle | ⬜ | |
+| 51 | _____ | Final Project Planning | ⬜ | |
+| 52 | _____ | Final Project Execution | ⬜ | |
+| 53 | _____ | Final Project Presentation | ⬜ | |
 
 **Phase 3 Concepts Mastered:**
 - ⬜ Variables and parameters
