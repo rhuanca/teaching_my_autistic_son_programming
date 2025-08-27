@@ -30,9 +30,29 @@ Learn how to create spirals by incrementally increasing distances or angles!
 
 ### Step 3: Learn About the MODULO Operator
 - The `MODULO` operator helps find the remainder when dividing two numbers.
+- Think of it like a clock:
+  - Imagine a clock with numbers 0 to 6 instead of 1 to 12.
+  - When you count past 6, you start back at 0.
+  - This is how `MODULO` works—it cycles through numbers.
+
 - Example:
-  - `5 MODULO 2` gives `1` because 5 divided by 2 leaves a remainder of 1.
+  - `5 MODULO 3` gives `2` because 5 divided by 3 leaves a remainder of 2.
   - `6 MODULO 3` gives `0` because 6 is evenly divisible by 3.
+  - `10 MODULO 4` gives `2` because 10 divided by 4 leaves a remainder of 2.
+
+- Visualize it:
+```
+  0 -- 1 -- 2
+  |         |
+  6         3
+  |         |
+  5 -- 4 -- 3
+```
+  - The numbers wrap around like a circle. For example:
+    - `7 MODULO 7` → `0`
+    - `8 MODULO 7` → `1`
+    - `9 MODULO 7` → `2`
+
 - Try these commands in FMSLogo:
   ```
   PRINT 5 MODULO 2
